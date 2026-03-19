@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-secondary text-white font-sans overflow-x-hidden;
+    background-color: #0f0f0f;
+    transition: filter 0.5s ease, background-color 0.5s ease;
+  }
+}
+
+/* Light Mode Magic - Inverts black/white and adds a beautiful, rich gradient */
+html.light {
+  filter: invert(1) hue-rotate(180deg);
+  /* When inverted, #fff matches black on light side. This gradient pre-inversion becomes a stunning sunset/cyan mix */
+  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+}
+
+html.light body {
+  background: transparent;
+}
+
+html.light img, 
+html.light video,
+html.light .no-invert {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+.gradient-text {
+  @apply text-transparent bg-clip-text bg-gradient-to-r from-accent-start to-accent-end;
+}
+
+.gradient-bg {
+  @apply bg-gradient-to-r from-accent-start to-accent-end;
+}
+
+.card-glass {
+  @apply bg-primary/80 backdrop-blur-md border border-white/10 shadow-xl;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #0f0f0f;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #ff512f;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #dd2476;
+}
+
+/* Organic Morphing Blob */
+@keyframes blob-morph {
+  0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: rotate(0deg) scale(1); }
+  50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; transform: rotate(180deg) scale(1.05); }
+  100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: rotate(360deg) scale(1); }
+}
+.animate-blob {
+  animation: blob-morph 15s ease-in-out infinite;
+}
+
+/* Kinetic Gradient Wave */
+@keyframes wave {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.animate-wave {
+  background-size: 200% 200%;
+  animation: wave 4s ease infinite;
+}
+
+/* Shimmer / Liquid Light Reflection */
+@keyframes shimmer {
+  0% { transform: translateX(-150%) skewX(-30deg); }
+  100% { transform: translateX(150%) skewX(-30deg); }
+}
+.animate-shimmer {
+  animation: shimmer 3s infinite;
+}
