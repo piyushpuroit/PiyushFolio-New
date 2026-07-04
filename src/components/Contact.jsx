@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { Mail, Phone, MapPin, Send, Github, Linkedin, Instagram } from 'lucide-react';
+import { Mail, Phone, MapPin, Send } from 'lucide-react';
+import contactService from '../api/contactService';
+import { useToast } from './Toast';
 
 const Contact = () => {
   const controls = useAnimation();
   const [ref, inView] = useInView({ threshold: 0.1, triggerOnce: true });
 
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', subject: '', message: '' });
   const [status, setStatus] = useState({ type: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const toast = useToast();
 
   useEffect(() => {
     if (inView) {
@@ -25,26 +28,26 @@ const Contact = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setStatus({ type: '', message: '' });
+    // Basic validation
+    if (!formData.name.trim() || !formData.email.trim() || !formData.subject.trim() || !formData.message.trim()) {
+      toast.show('Please fill all required fields', { type: 'error' });
+      setIsSubmitting(false);
+      return;
+    }
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRe.test(formData.email)) {
+      toast.show('Please enter a valid email address', { type: 'error' });
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
-      // Connects to the Express backend running on 5000
-      const response = await fetch('http://localhost:5000/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setStatus({ type: 'success', message: 'Message sent successfully! I will get back to you soon.' });
-        setFormData({ name: '', email: '', message: '' });
-      } else {
-        setStatus({ type: 'error', message: data.error || 'Failed to send message.' });
-      }
+      await contactService.submitContact(formData);
+      setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+      toast.show('Message sent successfully! I will get back to you soon.', { type: 'success' });
     } catch (error) {
       console.error('Contact form error:', error);
-      setStatus({ type: 'error', message: 'Network error. Make sure the backend server is running.' });
+      toast.show((error && error.message) || 'Network error. Make sure the backend server is running.', { type: 'error' });
     } finally {
       setIsSubmitting(false);
     }
@@ -57,16 +60,15 @@ const Contact = () => {
 
   const itemVariants = {
     hidden: { y: 30, opacity: 0 },
-    visible: { y: 0, opacity: 1, transition: { duration: 0.6 } }
+    visible: { y: 0, opacity: 1, transition: { duration: 0.3 } }
   };
 
   return (
-    <section id="contact" className="py-12 relative">
+    <section id="contact" className="pb-12 relative">
       <div className="container mx-auto px-6 md:px-12">
         <motion.div
-          ref={ref}
           initial="hidden"
-          animate={controls}
+          animate="visible"
           variants={containerVariants}
           className="max-w-6xl mx-auto"
         >
@@ -129,14 +131,22 @@ const Contact = () => {
                 <div className="mt-10 pt-8 border-t border-white/10">
                   <h4 className="text-sm font-tech text-gray-400 mb-4">Social Profiles</h4>
                   <div className="flex space-x-4">
-                    <a href="https://github.com/piyushpuroit" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-[#333] hover:text-white transition-all transform hover:-translate-y-1">
-                      <Github size={20} />
+                    <a href="https://github.com/piyushpuroit" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="group">
+                      <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white group-hover:bg-white group-hover:text-[#181717] transition-all duration-300 transform-gpu group-hover:-translate-y-1 group-hover:scale-105 shadow-sm ring-0 group-hover:ring-3 group-hover:ring-accent-start/20">
+                        <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="currentColor" d="M12 .297a12 12 0 00-3.793 23.414c.6.111.82-.26.82-.577 0-.285-.01-1.04-.016-2.04-3.338.726-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.757-1.333-1.757-1.09-.745.083-.73.083-.73 1.205.085 1.84 1.238 1.84 1.238 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.605-2.665-.304-5.466-1.332-5.466-5.93 0-1.31.469-2.382 1.235-3.222-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23a11.5 11.5 0 016.008 0c2.292-1.552 3.299-1.23 3.299-1.23.653 1.652.242 2.873.119 3.176.77.84 1.233 1.912 1.233 3.222 0 4.61-2.803 5.624-5.475 5.921.43.372.814 1.102.814 2.222 0 1.605-.014 2.898-.014 3.293 0 .32.216.694.825.576A12 12 0 0012 .297z"/></svg>
+                      </div>
                     </a>
-                    <a href="https://www.linkedin.com/in/piyush-purohit-qs5474/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-[#0077b5] hover:text-white transition-all transform hover:-translate-y-1">
-                      <Linkedin size={20} />
+
+                    <a href="https://www.linkedin.com/in/piyush-purohit-qs5474/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="group">
+                      <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white group-hover:bg-[#0077b5] group-hover:text-white transition-all duration-300 transform-gpu group-hover:-translate-y-1 group-hover:scale-105 shadow-sm ring-0 group-hover:ring-3 group-hover:ring-accent-start/20">
+                        <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="2" fill="#0077B5"/><path d="M6.94 9.5H9.2v8.3H6.94zM8.06 6.9c.78 0 1.26.52 1.26 1.2-.01.68-.48 1.2-1.25 1.2H8.06c-.78 0-1.26-.52-1.26-1.2 0-.68.48-1.2 1.25-1.2zM11.4 9.5h2.15v1.14h.03c.3-.57 1.04-1.17 2.14-1.17 2.29 0 2.71 1.51 2.71 3.47v4.86h-2.26v-4.31c0-1.03-.02-2.36-1.44-2.36-1.44 0-1.66 1.12-1.66 2.29v4.38H11.4z" fill="#fff"/></svg>
+                      </div>
                     </a>
-                    <a href="https://www.instagram.com/piyush._.peeyush/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-gradient-to-tr hover:from-[#f09433] hover:via-[#dc2743] hover:to-[#bc1888] hover:text-white transition-all transform hover:-translate-y-1">
-                      <Instagram size={20} />
+
+                    <a href="https://www.instagram.com/piyush._.peeyush/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="group">
+                      <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white group-hover:bg-gradient-to-tr group-hover:from-[#f09433] group-hover:via-[#dc2743] group-hover:to-[#bc1888] group-hover:text-white transition-all duration-300 transform-gpu group-hover:-translate-y-1 group-hover:scale-105 shadow-sm ring-0 group-hover:ring-3 group-hover:ring-accent-start/20">
+                        <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="igGrad2" x1="0%" x2="100%" y1="0%" y2="100%"><stop offset="0%" stopColor="#f58529"/><stop offset="30%" stopColor="#dd2a7b"/><stop offset="60%" stopColor="#8134af"/><stop offset="100%" stopColor="#515bd4"/></linearGradient></defs><rect x="2" y="2" width="20" height="20" rx="5" fill="url(#igGrad2)"/><path d="M12 7.2a4.8 4.8 0 100 9.6 4.8 4.8 0 000-9.6zm0 7.92a3.12 3.12 0 110-6.24 3.12 3.12 0 010 6.24z" fill="#fff"/><circle cx="17.5" cy="6.5" r="0.9" fill="#fff"/></svg>
+                      </div>
                     </a>
                   </div>
                 </div>
@@ -176,6 +186,34 @@ const Contact = () => {
                         required
                         className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent-start focus:ring-1 focus:ring-accent-start transition-colors"
                         placeholder="your@email.com"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label htmlFor="phone" className="text-sm font-tech text-gray-400">Phone Number</label>
+                      <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent-start focus:ring-1 focus:ring-accent-start transition-colors"
+                        placeholder="+91 6367483860"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="subject" className="text-sm font-tech text-gray-400">Subject</label>
+                      <input
+                        type="text"
+                        id="subject"
+                        name="subject"
+                        value={formData.subject}
+                        onChange={handleChange}
+                        required
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent-start focus:ring-1 focus:ring-accent-start transition-colors"
+                        placeholder="Inquiry / Feedback"
                       />
                     </div>
                   </div>

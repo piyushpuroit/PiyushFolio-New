@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import Tilt from 'react-parallax-tilt';
+import { getSkills } from '../api/portfolioService';
 
-const skillCategories = [
+const MOCK_SKILL_CATEGORIES = [
   {
     title: "Programming Languages",
     skills: ["Java", "C", "C++"]
@@ -38,9 +39,56 @@ const skillCategories = [
   }
 ];
 
+const SkeletonSkillCard = () => (
+  <div className="card-glass rounded-2xl p-6 border border-white/10 h-64 animate-pulse flex flex-col space-y-4">
+    <div className="h-6 bg-white/5 rounded w-1/2 mb-4"></div>
+    <div className="flex flex-wrap gap-3">
+      <div className="h-8 bg-white/5 rounded w-20"></div>
+      <div className="h-8 bg-white/5 rounded w-24"></div>
+      <div className="h-8 bg-white/5 rounded w-16"></div>
+      <div className="h-8 bg-white/5 rounded w-28"></div>
+    </div>
+  </div>
+);
+
 const Skills = () => {
+  const [skillCategories, setSkillCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const controls = useAnimation();
   const [ref, inView] = useInView({ threshold: 0.1, triggerOnce: true });
+
+  useEffect(() => {
+    const fetchSkills = async () => {
+      try {
+        const data = await getSkills();
+        if (data && data.length > 0) {
+          // Group by category
+          const groups = {};
+          data.forEach((skill) => {
+            const cat = skill.category || 'General';
+            if (!groups[cat]) {
+              groups[cat] = [];
+            }
+            groups[cat].push(skill.name);
+          });
+          const formatted = Object.keys(groups).map((key) => ({
+            title: key,
+            skills: groups[key]
+          }));
+          setSkillCategories(formatted);
+        } else {
+          setSkillCategories(MOCK_SKILL_CATEGORIES);
+        }
+      } catch (err) {
+        console.error('Error fetching skills:', err);
+        setSkillCategories(MOCK_SKILL_CATEGORIES);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchSkills();
+  }, []);
 
   useEffect(() => {
     if (inView) {
@@ -58,18 +106,17 @@ const Skills = () => {
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1, transition: { duration: 0.5 } }
+    visible: { y: 0, opacity: 1, transition: { duration: 0.3 } }
   };
 
   return (
-    <section id="skills" className="py-16 relative overflow-hidden">
+    <section id="skills" className="pb-12 relative overflow-hidden">
       {/* Organic gradient morphing background blob */}
       <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent-end/10 blur-[120px] -z-10 pointer-events-none animate-blob" style={{ animationDelay: '2s' }}></div>
       <div className="container mx-auto px-6 md:px-12 relative z-10">
         <motion.div
-          ref={ref}
           initial="hidden"
-          animate={controls}
+          animate="visible"
           variants={containerVariants}
           className="max-w-6xl mx-auto"
         >
@@ -84,8 +131,11 @@ const Skills = () => {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {skillCategories.map((category, idx) => (
-              <motion.div
+            {isLoading ? (
+              Array.from({ length: 6 }).map((_, i) => <SkeletonSkillCard key={i} />)
+            ) : (
+              skillCategories.map((category, idx) => (
+                <motion.div
                 key={idx}
                 variants={itemVariants}
                 className="h-full"
@@ -121,9 +171,8 @@ const Skills = () => {
                   </div>
                 </Tilt>
               </motion.div>
-            ))}
+            )))}
           </div>
-
         </motion.div>
       </div>
     </section>

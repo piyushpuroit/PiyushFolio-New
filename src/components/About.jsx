@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Terminal, Code2, Database, Layout } from 'lucide-react';
-
 const events = [
   {
     year: "2024",
@@ -18,6 +17,11 @@ const events = [
     year: "2025",
     title: "Full Stack Engineer",
     desc: "Architecting the core frontend infrastructure at Trivana Hospitality."
+  },
+  {
+    year: "2026",
+    title: "GATE CSE Qualified",
+    desc: "Qualified GATE CSE 2026 with a score of 423."
   },
   {
     year: "2027",
@@ -51,19 +55,18 @@ const About = () => {
     visible: {
       y: 0,
       opacity: 1,
-      transition: { duration: 0.6 }
+      transition: { duration: 0.3 }
     }
   };
 
   return (
-    <section id="about" className="py-12 relative overflow-hidden">
+    <section id="about" className="pb-12 relative overflow-hidden">
       {/* Organic gradient morphing background blob */}
       <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent-start/10 blur-[100px] -z-10 pointer-events-none animate-blob"></div>
       <div className="container mx-auto px-6 md:px-12 relative z-10">
         <motion.div
-          ref={ref}
           initial="hidden"
-          animate={controls}
+          animate="visible"
           variants={containerVariants}
           className="max-w-6xl mx-auto"
         >

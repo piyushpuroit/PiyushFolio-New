@@ -1,11 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import Tilt from 'react-parallax-tilt';
 
 import { Github, ExternalLink, ArrowRight } from 'lucide-react';
+import { getProjects } from '../api/portfolioService';
 
-const projects = [
+const MOCK_PROJECTS = [
   {
     id: 1,
     title: "Hospitality Management Platform",
@@ -37,7 +38,7 @@ const projects = [
     tags: ["HTML5", "CSS3", "JavaScript", "Figma"],
     github: "https://github.com/piyushpuroit",
     demo: "#",
-    image: "/fitness-preview.jpg", // Using local image path
+    image: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
     isAppMockup: true
   },
   {
@@ -71,14 +72,61 @@ const projects = [
     tags: ["React", "Tailwind CSS", "Framer Motion", "Vite"],
     github: "https://github.com/piyushpuroit",
     demo: "https://piyushport-folio.netlify.app/",
-    image: "/portfolio-preview.jpg",
+    image: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
     isAppMockup: false
   }
 ];
 
+const SkeletonCard = () => (
+  <div className="card-glass rounded-2xl overflow-hidden border border-white/10 h-[450px] animate-pulse p-6 flex flex-col space-y-4">
+    <div className="bg-white/5 h-48 w-full rounded-xl"></div>
+    <div className="h-6 bg-white/5 rounded w-3/4"></div>
+    <div className="h-4 bg-white/5 rounded w-full"></div>
+    <div className="h-4 bg-white/5 rounded w-5/6"></div>
+    <div className="flex gap-2 pt-4">
+      <div className="h-6 bg-white/5 rounded w-16"></div>
+      <div className="h-6 bg-white/5 rounded w-16"></div>
+    </div>
+  </div>
+);
+
 const Projects = () => {
+  const [projectsList, setProjectsList] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const controls = useAnimation();
   const [ref, inView] = useInView({ threshold: 0.1, triggerOnce: true });
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const data = await getProjects();
+        if (data && data.length > 0) {
+          // Map DB project format to local structure
+          const formatted = data.map((item) => ({
+            id: item.id,
+            title: item.title,
+            description: item.shortDescription,
+            features: item.longDescription ? item.longDescription.split('\n') : [],
+            tags: item.technologies ? item.technologies.split(',') : [],
+            github: item.githubUrl || '#',
+            demo: item.liveUrl || '#',
+            image: item.imageUrl || 'https://via.placeholder.com/600x400',
+            isAppMockup: item.title.toLowerCase().includes('fitness') // Or infer
+          }));
+          setProjectsList(formatted);
+        } else {
+          setProjectsList(MOCK_PROJECTS);
+        }
+      } catch (err) {
+        console.error('Error fetching projects:', err);
+        setProjectsList(MOCK_PROJECTS);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProjects();
+  }, []);
 
   useEffect(() => {
     if (inView) {
@@ -93,16 +141,15 @@ const Projects = () => {
 
   const itemVariants = {
     hidden: { y: 40, opacity: 0 },
-    visible: { y: 0, opacity: 1, transition: { duration: 0.6 } }
+    visible: { y: 0, opacity: 1, transition: { duration: 0.3 } }
   };
 
   return (
-    <section id="projects" className="py-12 relative">
+    <section id="projects" className="pb-12 relative">
       <div className="container mx-auto px-6 md:px-12">
         <motion.div
-          ref={ref}
           initial="hidden"
-          animate={controls}
+          animate="visible"
           variants={containerVariants}
           className="max-w-6xl mx-auto"
         >
@@ -117,12 +164,15 @@ const Projects = () => {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {projects.map((project) => (
-              <motion.div 
-                key={project.id} 
-                variants={itemVariants}
-                className="h-full"
-              >
+            {isLoading ? (
+              Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)
+            ) : (
+              projectsList.map((project) => (
+                <motion.div 
+                  key={project.id} 
+                  variants={itemVariants}
+                  className="h-full"
+                >
                   <Tilt
                     tiltMaxAngleX={8}
                     tiltMaxAngleY={8}
@@ -150,6 +200,7 @@ const Projects = () => {
                         <img
                           src={project.image}
                           alt={project.title}
+                          loading="lazy"
                           className={`w-full h-full ${project.isAppMockup ? 'object-contain object-top rounded-b-[2px] shadow-sm' : 'object-cover'} transform group-hover:scale-105 transition-transform duration-700`}
                           onError={(e) => { e.target.src = 'https://via.placeholder.com/600x400/141414/ffffff?text=' + project.title.split(' ').join('+') }}
                         />
@@ -187,9 +238,10 @@ const Projects = () => {
                             href={project.github}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors flex items-center text-sm"
+                            className="group text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors flex items-center text-sm"
                           >
-                            <Github size={18} className="mr-1.5" /> Code
+                              <svg className="mr-1.5 w-4 h-4 transition-transform duration-300 group-hover:scale-110" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="currentColor" d="M12 .297a12 12 0 00-3.793 23.414c.6.111.82-.26.82-.577 0-.285-.01-1.04-.016-2.04-3.338.726-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.757-1.333-1.757-1.09-.745.083-.73.083-.73 1.205.085 1.84 1.238 1.84 1.238 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.605-2.665-.304-5.466-1.332-5.466-5.93 0-1.31.469-2.382 1.235-3.222-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23a11.5 11.5 0 016.008 0c2.292-1.552 3.299-1.23 3.299-1.23.653 1.652.242 2.873.119 3.176.77.84 1.233 1.912 1.233 3.222 0 4.61-2.803 5.624-5.475 5.921.43.372.814 1.102.814 2.222 0 1.605-.014 2.898-.014 3.293 0 .32.216.694.825.576A12 12 0 0012 .297z"/></svg>
+                              Code
                           </a>
                           {project.demo !== "#" && (
                             <a
@@ -205,8 +257,9 @@ const Projects = () => {
                       </div>
                     </div>
                   </Tilt>
-              </motion.div>
-            ))}
+                </motion.div>
+              )))
+            }
           </div>
 
           <motion.div variants={itemVariants} className="mt-16 text-center">

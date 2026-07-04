@@ -1,0 +1,16 @@
+{
+  "name": "Piyush Purohit — Portfolio",
+  "short_name": "PiyushP",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "description": "Portfolio of Piyush Purohit — Full Stack Software Engineer.",
+  "icons": [
+    {
+      "src": "/profile.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}

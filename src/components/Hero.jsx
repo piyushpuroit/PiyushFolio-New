@@ -1,11 +1,26 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { TypeAnimation } from 'react-type-animation';
 import { Download, Mail, ArrowRight, Code } from 'lucide-react';
-import { Link } from 'react-scroll';
 import Tilt from 'react-parallax-tilt';
+import { getResume } from '../api/portfolioService';
 
-const Hero = () => {
+const Hero = ({ setActiveSection }) => {
+  const [resumeUrl, setResumeUrl] = useState('/Piyush_Purohit_Resume.pdf');
+
+  useEffect(() => {
+    const fetchResume = async () => {
+      try {
+        const data = await getResume();
+        if (data && data.downloadUrl) {
+          setResumeUrl(data.downloadUrl);
+        }
+      } catch (err) {
+        console.error('Error fetching resume url:', err);
+      }
+    };
+    fetchResume();
+  }, []);
   return (
     <section id="hero" className="min-h-screen flex items-center justify-center relative pt-16 overflow-hidden">
 
@@ -57,8 +72,8 @@ const Hero = () => {
                 className="relative"
               >
                 <div className="relative w-48 h-48 sm:w-56 sm:h-56 rounded-full p-2 gradient-bg shadow-[0_0_20px_rgba(0,242,254,0.3)]">
-                  <div className="w-full h-full rounded-full bg-secondary overflow-hidden border-4 border-secondary flex items-center justify-center relative">
-                    <img src="/profile.jpg" alt="Piyush Purohit" className="w-full h-full object-cover z-0" />
+                    <div className="w-full h-full rounded-full bg-secondary overflow-hidden border-4 border-secondary flex items-center justify-center relative">
+                    <img src="/profile.jpg" alt="Piyush Purohit" loading="lazy" className="w-full h-full object-cover z-0" />
                   </div>
                   {/* GATE Badge SVG */}
                   <div className="absolute -bottom-1 -right-1 w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center -rotate-12 drop-shadow-md z-20">
@@ -112,18 +127,18 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4 pt-6 justify-center md:justify-start"
           >
-            <Link to="projects" smooth={true} duration={500} className="cursor-pointer group relative inline-flex items-center justify-center px-6 md:px-8 py-2.5 md:py-3 font-medium text-white bg-[#0f0f0f] border border-[#00f2fe]/40 rounded-full overflow-hidden shadow-[0_0_15px_rgba(0,242,254,0.1)] hover:shadow-[0_0_30px_rgba(0,242,254,0.4)] hover:border-[#00f2fe] hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto">
+            <button onClick={() => { setActiveSection('projects'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="cursor-pointer group relative inline-flex items-center justify-center px-6 md:px-8 py-2.5 md:py-3 font-medium text-white bg-[#0f0f0f] border border-[#00f2fe]/40 rounded-full overflow-hidden shadow-[0_0_15px_rgba(0,242,254,0.1)] hover:shadow-[0_0_30px_rgba(0,242,254,0.4)] hover:border-[#00f2fe] hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto">
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-accent-start to-accent-end opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
               View Projects
               <ArrowRight className="ml-2 w-4 h-4 md:w-5 md:h-5 text-[#00f2fe] group-hover:translate-x-1 transition-transform" />
-            </Link>
+            </button>
 
-            <Link to="contact" smooth={true} duration={500} className="cursor-pointer group inline-flex items-center justify-center px-6 md:px-8 py-2.5 md:py-3 font-medium text-white bg-[#141414] border-2 border-white/10 rounded-full hover:bg-white/5 hover:border-white/30 transition-all w-full sm:w-auto">
+            <button onClick={() => { setActiveSection('contact'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="cursor-pointer group inline-flex items-center justify-center px-6 md:px-8 py-2.5 md:py-3 font-medium text-white bg-[#141414] border-2 border-white/10 rounded-full hover:bg-white/5 hover:border-white/30 transition-all w-full sm:w-auto">
               Contact Me
               <Mail className="ml-2 w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-white transition-colors" />
-            </Link>
+            </button>
 
-            <a href="/Piyush_Purohit_Resume.pdf" download className="group inline-flex items-center justify-center px-6 md:px-8 py-2.5 md:py-3 font-medium text-gray-400 hover:text-white transition-colors w-full sm:w-auto">
+            <a href={resumeUrl} download className="group inline-flex items-center justify-center px-6 md:px-8 py-2.5 md:py-3 font-medium text-gray-400 hover:text-white transition-colors w-full sm:w-auto">
               <Download className="mr-2 w-4 h-4 md:w-5 md:h-5 group-hover:-translate-y-1 transition-transform" />
               Resume
             </a>
@@ -146,9 +161,9 @@ const Hero = () => {
             className="w-full flex justify-center relative"
           >
             <div className="relative w-80 h-80 rounded-full p-2 gradient-bg shadow-[0_0_40px_rgba(0,242,254,0.3)] group cursor-pointer hover:shadow-[0_0_60px_rgba(79,172,254,0.5)] transition-shadow duration-500">
-              <div className="w-full h-full rounded-full bg-secondary overflow-hidden border-4 border-secondary flex items-center justify-center relative">
+                <div className="w-full h-full rounded-full bg-secondary overflow-hidden border-4 border-secondary flex items-center justify-center relative">
                 {/* Completely clear image with no grayscale or overlay */}
-                <img src="/profile.jpg" alt="Piyush Purohit" className="w-full h-full object-cover z-0" onError={(e) => { e.target.src = 'https://via.placeholder.com/400x400/141414/ffffff?text=Piyush+Purohit' }} />
+                <img src="/profile.jpg" alt="Piyush Purohit" loading="lazy" className="w-full h-full object-cover z-0" onError={(e) => { e.target.src = 'https://via.placeholder.com/400x400/141414/ffffff?text=Piyush+Purohit' }} />
               </div>
               
               {/* Spinning ring decorative */}
