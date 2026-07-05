@@ -64,7 +64,7 @@ const Contact = () => {
   };
 
   return (
-    <section id="contact" className="pb-12 relative">
+    <section id="contact" className="pt-10 pb-12 relative">
       <div className="container mx-auto px-6 md:px-12">
         <motion.div
           initial="hidden"

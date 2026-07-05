@@ -56,7 +56,7 @@ const Achievements = () => {
   }, [controls, inView]);
 
   return (
-    <section id="achievements" className="pb-12 relative overflow-hidden">
+    <section id="achievements" className="pt-10 pb-12 relative overflow-hidden">
       {/* Background decorations */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-accent-start/10 rounded-full blur-[100px] -z-10"></div>
 

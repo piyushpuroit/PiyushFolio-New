@@ -60,7 +60,7 @@ const About = () => {
   };
 
   return (
-    <section id="about" className="pb-12 relative overflow-hidden">
+    <section id="about" className="pt-10 pb-12 relative overflow-hidden">
       {/* Organic gradient morphing background blob */}
       <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent-start/10 blur-[100px] -z-10 pointer-events-none animate-blob"></div>
       <div className="container mx-auto px-6 md:px-12 relative z-10">

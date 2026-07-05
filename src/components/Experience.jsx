@@ -94,7 +94,7 @@ const Experience = () => {
   };
 
   return (
-    <section id="experience" className="pb-12 relative bg-primary/30">
+    <section id="experience" className="pt-10 pb-12 relative bg-primary/30">
       <div className="container mx-auto px-6 md:px-12">
         <motion.div
           initial="hidden"

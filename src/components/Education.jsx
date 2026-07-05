@@ -159,7 +159,7 @@ const Education = () => {
   };
 
   return (
-    <section id="education" className="pb-12 relative bg-primary/20">
+    <section id="education" className="pt-10 pb-12 relative bg-primary/20">
       <div className="container mx-auto px-6 md:px-12">
         <motion.div
           initial="hidden"
