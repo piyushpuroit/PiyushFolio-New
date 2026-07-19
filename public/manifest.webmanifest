@@ -1,14 +1,14 @@
 {
-  "name": "Piyush Purohit — Portfolio",
+  "name": "Piyush Purohit — Full Stack Developer Portfolio",
   "short_name": "PiyushP",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
-  "description": "Portfolio of Piyush Purohit — Full Stack Software Engineer.",
+  "description": "Official portfolio of Piyush Purohit, Full Stack Developer skilled in React, Java, Spring Boot & SQL.",
   "icons": [
     {
-      "src": "/profile.jpg",
+      "src": "/favicon.svg.jpg",
       "sizes": "512x512",
       "type": "image/jpeg"
     }

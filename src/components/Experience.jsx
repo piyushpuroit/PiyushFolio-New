@@ -10,6 +10,7 @@ const MOCK_EXPERIENCES = [
     role: "Chief Frontend Officer & Full Stack Developer",
     company: "Trivana Hospitality",
     period: "June 2025 – Present",
+    ppoUrl: "/trivana offer latter ppo.jpg",
     description: [
       "Created the BookTrivana app using React Native, utilizing the same backend as the website (https://booktrivana.com/).",
       "Worked on POS billing and other core sections of our startup as Chief Frontend Officer.",
@@ -61,6 +62,7 @@ const Experience = () => {
             role: item.position,
             company: item.company,
             period: `${item.startDate} – ${item.endDate || 'Present'}`,
+            ppoUrl: item.company?.toLowerCase().includes('trivana') ? '/trivana offer latter ppo.jpg' : '',
             description: item.description ? item.description.split('\n') : []
           }));
           setExperiences(formatted);
@@ -134,6 +136,19 @@ const Experience = () => {
                         {exp.period}
                       </div>
                     </div>
+
+                    {exp.ppoUrl && (
+                      <div className="mb-4 md:mb-5">
+                        <a
+                          href={exp.ppoUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center px-4 py-2 rounded-full border border-accent-start/30 bg-white/5 text-sm font-semibold text-accent-start hover:text-accent-end hover:border-accent-end/40 transition-colors"
+                        >
+                          View PPO
+                        </a>
+                      </div>
+                    )}
 
                     <ul className="space-y-2 md:space-y-3 mt-4 md:mt-6">
                       {exp.description.map((desc, i) => (

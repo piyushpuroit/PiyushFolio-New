@@ -57,9 +57,10 @@ const Hero = ({ setActiveSection }) => {
               <span className="text-[10px] md:text-xs font-medium text-white tracking-wide">Available for new opportunities</span>
             </div>
             
-            <h2 className="text-lg md:text-2xl font-tech text-gray-400 mb-1 md:mb-2"></h2>
+            <h2 className="sr-only">Full Stack Developer and GATE CSE 2026 Qualified</h2>
             <h1 className="text-4xl md:text-7xl font-bold font-sans text-white mb-2 md:mb-4 tracking-tight">
               Piyush <span className="gradient-text animate-wave">Purohit</span>
+              <span className="sr-only"> Full Stack Developer | GATE CSE 2026 Qualified | React, Java, Spring Boot & SQL</span>
             </h1>
 
             {/* Mobile-Only Profile Image Frame (Under Name) */}
